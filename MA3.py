@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """ MA3.py
 
 Student: Julia Rask Lind
