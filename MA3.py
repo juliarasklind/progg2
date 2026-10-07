@@ -108,7 +108,6 @@ def _point_counter(n, d):
 
     return inside_circle
 
-
 def sphere_volume_parallel(n, d, np=10):
     # n is the number of points
     # d is the number of dimensions of the sphere
@@ -120,12 +119,24 @@ def sphere_volume_parallel(n, d, np=10):
         total_inside_circle = sum(p.result() for p in process)
 
     return (total_inside_circle / (s * np)) * 2**d
-    
+
+def sphere_volume_parallel_n(n, d, np=10):
+    # n is the number of points
+    # d is the number of dimensions of the sphere
+    # np is the number of processes
+    s = n // np
+
+    with future.ProcessPoolExecutor(max_workers=np) as ex:
+        process = [ex.submit(sphere_volume_numba, s, d) for _ in range(np)]
+        total_inside_circle = sum(p.result() for p in process)
+
+    return mean(total_inside_circle)
+
 def main():
-    # Exc1
-    # dots = [1000, 10000, 100000]
-    # for n in dots:
-    #     approximate_pi(n)
+    #Exc1
+    dots = [1000, 10000, 100000]
+    for n in dots:
+        approximate_pi(n)
 
     # Exc2
     n = 100000
@@ -151,13 +162,18 @@ def main():
     n = 1000000
     d = 11
     start = pc()
-    sphere_volume(n, d)
+    sphere_volume_parallel(n, d)
     stop = pc()
-    print(f"Exc4: Sequential time of {d} and {n}: {stop-start}")
+    print(f"Exc4: parallell time of {d} and {n}: {stop-start}")
+    start = pc()
+    sphere_volume_parallel_n(n, d)
+    stop = pc()
+    print(f"Exc4: parallell numba time of {d} and {n}: {stop-start}")
+    start = pc()
+    sphere_volume_numba(n, d)
+    stop = pc()
+    print(f"Exc4: numba time of {d} and {n}: {stop-start}")
     print("What is parallel time?")
-
-    
-    
 
 if __name__ == '__main__':
 	main()
