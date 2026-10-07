@@ -128,7 +128,7 @@ def sphere_volume_parallel_n(n, d, np=10):
 
     with future.ProcessPoolExecutor(max_workers=np) as ex:
         process = [ex.submit(sphere_volume_numba, s, d) for _ in range(np)]
-        total_inside_circle = sum(p.result() for p in process)
+        total_inside_circle = [p.result() for p in process]
 
     return mean(total_inside_circle)
 
